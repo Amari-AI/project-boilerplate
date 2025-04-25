@@ -6,8 +6,8 @@ from pathlib import Path
 def test_process_documents():
     # Test with sample files
     sample_files = [
-        str(Path("data/sample_bill_of_lading.pdf")),
-        str(Path("data/sample_invoice.xlsx"))
+        # str(Path("documents/sample_bill_of_lading.pdf")),
+        str(Path("documents/InvoicePackingList.xlsx"))
     ]
     result = process_documents(sample_files)
     
