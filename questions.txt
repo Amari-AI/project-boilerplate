@@ -1,0 +1,15 @@
+What are the possible file types we need to be able to consider
+
+What is the criteria for the form to be filled out? Is the form / list of fields for 
+the form fixed or is that also be parsed out from the form itself?
+
+Can I add my own requirements or are the libraries fixed?
+
+Possible languages to consider?
+
+How large can the input documents be? DO I need to take LLM token constraints into account?
+
+
+POA:
+
+1. Parse out information from PDF
