@@ -1,14 +1,15 @@
 import os
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
     # TODO: Add configuration options
+    model_config = SettingsConfigDict(env_file=".env")
 
-    # OpenAI API Key
-    API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+    # Anthropic API Key
+    anthropic_api_key: str = ""
     
     # Document types
-    ALLOWED_DOCUMENT_TYPES: list[str] = [".pdf", ".xlsx"]
+    ALLOWED_DOCUMENT_TYPES: list[str] = [".pdf", ".xlsx", ".xls"]
 
 settings = Settings()

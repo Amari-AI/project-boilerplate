@@ -2,8 +2,10 @@ fastapi
 uvicorn
 python-multipart
 PyPDF2
+pdf2image
+pillow
 openpyxl
 requests
-openai
+anthropic
 pytest
 pydantic-settings

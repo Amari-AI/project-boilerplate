@@ -26,11 +26,22 @@ async def process_documents_endpoint(
     # Process documents
     document_data = process_documents(temp_file_paths)
 
-    # Extract data from document
-    extracted_data = extract_field_from_document(document_data)
+    # Extract data from document (using text or images)
+    extracted_data = extract_field_from_document(
+        document_text=document_data.get('text', ''),
+        images=document_data.get('images', [])
+    )
 
     # Clean up temp files
     for path in temp_file_paths:
         os.unlink(path)
 
-    return {"extracted_data": extracted_data} 
+    return {
+        "extracted_data": extracted_data,
+        "processing_info": {
+            "files_processed": len(document_data['file_info']),
+            "text_extracted": bool(document_data.get('text', '').strip()),
+            "images_processed": len(document_data.get('images', [])),
+            "file_details": document_data['file_info']
+        }
+    } 
