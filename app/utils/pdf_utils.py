@@ -1,5 +1,4 @@
 import PyPDF2
-import os
 import base64
 from typing import List, Tuple
 import io

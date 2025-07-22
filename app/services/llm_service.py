@@ -69,7 +69,7 @@ Required fields to extract (use information from ALL sources):
 - date: The document date in YYYY-MM-DD format (string or null if not found)
 - line_items_count: The total number of line items/products/rows in the invoice/manifest. Look for "TOTAL DATA ROWS", "LINE ITEMS:", item counts, or count the actual data rows in spreadsheets. This should be the total count of all products/items, not just 1. (integer or null if not found)
 - average_gross_weight: The average gross weight per item (number or null if not found)
-- average_price: The average price per item (number or null if not found)
+- average_price: The average unit price per individual item (not total shipment value). Look for unit prices, price per piece, or individual item costs. (number or null if not found)
 
 IMPORTANT: Look for information in BOTH the text above AND the images below. Some fields might only be visible in images, others only in text. Combine all available information to provide the most complete response.
 
@@ -134,7 +134,7 @@ Required fields:
 - date: The document date in YYYY-MM-DD format (string or null if not found)
 - line_items_count: The total number of line items/products/rows in the invoice/manifest. Look for "TOTAL DATA ROWS", "LINE ITEMS:", item counts, or count the actual data rows in spreadsheets. This should be the total count of all products/items, not just 1. (integer or null if not found)
 - average_gross_weight: The average gross weight per item (number or null if not found)
-- average_price: The average price per item (number or null if not found)
+- average_price: The average unit price per individual item (not total shipment value). Look for unit prices, price per piece, or individual item costs. (number or null if not found)
 
 For line_items_count specifically:
 - Look for explicit counts like "TOTAL DATA ROWS: X" or "SUMMARY: This spreadsheet contains X line items"
@@ -185,7 +185,7 @@ Required fields (search ALL images):
 - date: The document date in YYYY-MM-DD format (string or null if not found)
 - line_items_count: The total number of line items/products/rows visible in the images. Count all visible product entries, invoice lines, or manifest items across all images. This should be the total count, not just 1. (integer or null if not found)
 - average_gross_weight: The average gross weight per item (number or null if not found)
-- average_price: The average price per item (number or null if not found)
+- average_price: The average unit price per individual item (not total shipment value). Look for unit prices, price per piece, or individual item costs. (number or null if not found)
 
 IMPORTANT: Examine ALL images carefully. Information might be split across different pages or documents. Use information from ALL sources to provide the most complete and accurate data.
 

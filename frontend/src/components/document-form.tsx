@@ -11,6 +11,7 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { cn } from "@/lib/utils"
 
 const formSchema = z.object({
   bill_of_lading_number: z.string().nullable(),
@@ -23,7 +24,10 @@ const formSchema = z.object({
   average_price: z.number().nullable(),
 })
 
-export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
+export function DocumentForm({ data, shouldHighlightField }: { 
+  data: z.infer<typeof formSchema>
+  shouldHighlightField?: (fieldName: keyof z.infer<typeof formSchema>) => boolean
+}) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: data,
@@ -45,7 +49,14 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Bill of Lading Number</FormLabel>
                 <FormControl>
-                    <Input placeholder="BOL..." {...field} value={field.value ?? ""} />
+                    <Input 
+                      placeholder="BOL..." 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      className={cn(
+                        shouldHighlightField?.("bill_of_lading_number") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -58,7 +69,14 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Container Number</FormLabel>
                 <FormControl>
-                    <Input placeholder="Container..." {...field} value={field.value ?? ""} />
+                    <Input 
+                      placeholder="Container..." 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      className={cn(
+                        shouldHighlightField?.("container_number") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -71,7 +89,14 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Consignee Name</FormLabel>
                 <FormControl>
-                    <Input placeholder="Consignee Name" {...field} value={field.value ?? ""} />
+                    <Input 
+                      placeholder="Consignee Name" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      className={cn(
+                        shouldHighlightField?.("consignee_name") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -84,7 +109,14 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Consignee Address</FormLabel>
                 <FormControl>
-                    <Input placeholder="Consignee Address" {...field} value={field.value ?? ""} />
+                    <Input 
+                      placeholder="Consignee Address" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      className={cn(
+                        shouldHighlightField?.("consignee_address") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -97,7 +129,14 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Date</FormLabel>
                 <FormControl>
-                    <Input placeholder="YYYY-MM-DD" {...field} value={field.value ?? ""} />
+                    <Input 
+                      placeholder="YYYY-MM-DD" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      className={cn(
+                        shouldHighlightField?.("date") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -110,7 +149,15 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Line Items Count</FormLabel>
                 <FormControl>
-                    <Input type="number" {...field} value={field.value ?? ""} onChange={event => field.onChange(+event.target.value)} />
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      onChange={event => field.onChange(+event.target.value)} 
+                      className={cn(
+                        shouldHighlightField?.("line_items_count") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -123,7 +170,15 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Average Gross Weight</FormLabel>
                 <FormControl>
-                    <Input type="number" {...field} value={field.value ?? ""} onChange={event => field.onChange(+event.target.value)} />
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      onChange={event => field.onChange(+event.target.value)} 
+                      className={cn(
+                        shouldHighlightField?.("average_gross_weight") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>
@@ -136,7 +191,15 @@ export function DocumentForm({ data }: { data: z.infer<typeof formSchema> }) {
                 <FormItem>
                 <FormLabel>Average Price</FormLabel>
                 <FormControl>
-                    <Input type="number" {...field} value={field.value ?? ""} onChange={event => field.onChange(+event.target.value)} />
+                    <Input 
+                      type="number" 
+                      {...field} 
+                      value={field.value ?? ""} 
+                      onChange={event => field.onChange(+event.target.value)} 
+                      className={cn(
+                        shouldHighlightField?.("average_price") && "ring-2 ring-blue-500 bg-blue-50"
+                      )}
+                    />
                 </FormControl>
                 <FormMessage />
                 </FormItem>

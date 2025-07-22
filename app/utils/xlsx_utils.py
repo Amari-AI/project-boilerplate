@@ -2,8 +2,6 @@ import openpyxl
 import os
 import base64
 from typing import List, Tuple, Dict, Any
-import io
-from PIL import Image
 
 def extract_data_from_xlsx(file_path: str) -> Tuple[str, List[str]]:
     """
@@ -76,7 +74,6 @@ def extract_sheet_data(sheet) -> str:
         best_score = 0
 
         for i, row in enumerate(rows_data[:20]):  # Scan first 20 rows for header
-            # score = sum(1 for cell in row if str(cell).lower() in header_keywords)
             score = sum(1 for cell in row for keyword in header_keywords if keyword in str(cell).lower())
             if score > best_score and score > 1: # Require at least 2 keywords
                 best_score = score
