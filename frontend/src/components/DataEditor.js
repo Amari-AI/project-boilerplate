@@ -20,56 +20,6 @@ const DataEditor = ({ data, onDataUpdate }) => {
     onDataUpdate(newData);
   };
 
-  const updateInvoiceItem = (index, field, value) => {
-    const items = [...(editedData.invoice_list?.invoice_items || [])];
-    items[index] = { ...items[index], [field]: value };
-    
-    const newData = {
-      ...editedData,
-      invoice_list: {
-        ...editedData.invoice_list,
-        invoice_items: items
-      }
-    };
-    setEditedData(newData);
-    onDataUpdate(newData);
-  };
-
-  const addInvoiceItem = () => {
-    const newItem = {
-      serial_number: '',
-      description: '',
-      quantity: 0,
-      unit_value: 0,
-      total_weight: 0,
-      other_identifier: ''
-    };
-    
-    const items = [...(editedData.invoice_list?.invoice_items || []), newItem];
-    const newData = {
-      ...editedData,
-      invoice_list: {
-        ...editedData.invoice_list,
-        invoice_items: items
-      }
-    };
-    setEditedData(newData);
-    onDataUpdate(newData);
-  };
-
-  const removeInvoiceItem = (index) => {
-    const items = (editedData.invoice_list?.invoice_items || []).filter((_, i) => i !== index);
-    const newData = {
-      ...editedData,
-      invoice_list: {
-        ...editedData.invoice_list,
-        invoice_items: items
-      }
-    };
-    setEditedData(newData);
-    onDataUpdate(newData);
-  };
-
   const updateBillOfLading = (field, value) => {
     const newData = {
       ...editedData,
@@ -82,6 +32,45 @@ const DataEditor = ({ data, onDataUpdate }) => {
     onDataUpdate(newData);
   };
 
+  const calculateInvoiceItemsSummary = () => {
+    const items = editedData.invoice_list?.invoice_items || [];
+    
+    if (items.length === 0) {
+      return {
+        totalItems: 0,
+        averageWeightByQuantity: 0,
+        averagePrice: 0
+      };
+    }
+
+    const totalItems = items.length;
+    
+    // Calculate average price (simple average of unit values)
+    // const totalPrice = items.reduce((sum, item) => sum + (item.unit_value || 0), 0);
+    const totalQuantity = items.reduce((sum, item) => sum + (item.quantity || 0), 0);
+    
+    // Calculate average gross weight weighted by quantity
+    const totalWeightedWeight = items.reduce((sum, item) => {
+      const weight = item.total_weight || 0;
+      return sum + weight;
+    }, 0);
+
+    const totalWeightedValue = items.reduce((sum, item) => {
+      const quantity = item.quantity || 0;
+      const value = item.unit_value || 0;
+      return sum + (value * quantity);
+    }, 0);
+    
+    const averageWeightByQuantity = totalQuantity > 0 ? totalWeightedWeight / totalItems : 0;
+    const averagePriceByQuantity = totalQuantity > 0 ? totalWeightedValue / totalQuantity : 0;
+    
+    return {
+      totalItems,
+      averageWeightByQuantity: averageWeightByQuantity.toFixed(2),
+      averagePrice: averagePriceByQuantity.toFixed(2)
+    };
+  };
+
   const downloadJSON = () => {
     const dataStr = JSON.stringify(editedData, null, 2);
     const dataBlob = new Blob([dataStr], { type: 'application/json' });
@@ -92,6 +81,8 @@ const DataEditor = ({ data, onDataUpdate }) => {
     link.click();
     URL.revokeObjectURL(url);
   };
+
+  const invoiceItemsSummary = calculateInvoiceItemsSummary();
 
   return (
     <div className="data-editor">
@@ -114,85 +105,24 @@ const DataEditor = ({ data, onDataUpdate }) => {
             />
           </div>
 
-          <div className="invoice-items">
-            <div className="items-header">
-              <h4>Invoice Items</h4>
-              <button className="add-item-btn" onClick={addInvoiceItem}>
-                + Add Item
-              </button>
-            </div>
-
-            {editedData.invoice_list.invoice_items?.map((item, index) => (
-              <div key={index} className="invoice-item">
-                <div className="item-header">
-                  <span>Item {index + 1}</span>
-                  <button 
-                    className="remove-item-btn"
-                    onClick={() => removeInvoiceItem(index)}
-                  >
-                    ✕
-                  </button>
-                </div>
-                
-                <div className="item-grid">
-                  <div className="form-group">
-                    <label>Serial Number:</label>
-                    <input
-                      type="text"
-                      value={item.serial_number || ''}
-                      onChange={(e) => updateInvoiceItem(index, 'serial_number', e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Description:</label>
-                    <input
-                      type="text"
-                      value={item.description || ''}
-                      onChange={(e) => updateInvoiceItem(index, 'description', e.target.value)}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Quantity:</label>
-                    <input
-                      type="number"
-                      value={item.quantity || 0}
-                      onChange={(e) => updateInvoiceItem(index, 'quantity', parseInt(e.target.value) || 0)}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Unit Value:</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={item.unit_value || 0}
-                      onChange={(e) => updateInvoiceItem(index, 'unit_value', parseFloat(e.target.value) || 0)}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Total Weight:</label>
-                    <input
-                      type="number"
-                      step="0.01"
-                      value={item.total_weight || 0}
-                      onChange={(e) => updateInvoiceItem(index, 'total_weight', parseFloat(e.target.value) || 0)}
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label>Other Identifier:</label>
-                    <input
-                      type="text"
-                      value={item.other_identifier || ''}
-                      onChange={(e) => updateInvoiceItem(index, 'other_identifier', e.target.value)}
-                    />
-                  </div>
-                </div>
+          <div className="invoice-items-summary">
+            <h4>Invoice Items Summary</h4>
+            <div className="summary-grid">
+              <div className="summary-item">
+                <label>Line Items Count:</label>
+                <span className="summary-value">{invoiceItemsSummary.totalItems}</span>
               </div>
-            ))}
+              
+              <div className="summary-item">
+                <label>Average Gross Weight (weighted by quantity):</label>
+                <span className="summary-value">{invoiceItemsSummary.averageWeightByQuantity}</span>
+              </div>
+              
+              <div className="summary-item">
+                <label>Average Price per Item:</label>
+                <span className="summary-value">${invoiceItemsSummary.averagePrice}</span>
+              </div>
+            </div>
           </div>
         </div>
       )}
