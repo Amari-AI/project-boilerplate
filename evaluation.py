@@ -1,6 +1,7 @@
 import json
 import requests
 from pathlib import Path
+
 def evaluate_results(expected_data, actual_data):
     """
     Calculate accuracy metrics.

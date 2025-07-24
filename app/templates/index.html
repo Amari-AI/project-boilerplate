@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Processing App</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 Document Processing App</h1>
+            <p>Upload your documents to extract invoice and bill of lading information</p>
+        </header>
+
+        <div class="upload-section">
+            <form id="uploadForm" enctype="multipart/form-data">
+                <div class="file-upload-area" id="fileUploadArea">
+                    <div class="upload-icon">📁</div>
+                    <p>Click to upload or drag and drop files here</p>
+                    <p class="file-types">Supported: PDF, Images, Excel files</p>
+                    <input type="file" id="fileInput" name="files" multiple accept=".pdf,.jpg,.jpeg,.png,.xlsx,.xls" hidden>
+                </div>
+                
+                <div id="fileList" class="file-list"></div>
+                
+                <button type="submit" id="processBtn" class="process-btn" disabled>
+                    <span class="btn-text">Process Documents</span>
+                    <div class="spinner" id="spinner"></div>
+                </button>
+            </form>
+        </div>
+
+        <div id="results" class="results-section" style="display: none;">
+            <h2>Extracted Data</h2>
+            
+            <div id="invoiceResults" class="data-section">
+                <h3>📋 Invoice Information</h3>
+                <div id="invoiceContent"></div>
+            </div>
+            
+            <div id="bolResults" class="data-section">
+                <h3>🚢 Bill of Lading Information</h3>
+                <div id="bolContent"></div>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script src="{{ url_for('static', path='/app.js') }}"></script>
+</body>
+</html> 

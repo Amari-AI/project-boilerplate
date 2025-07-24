@@ -3,15 +3,16 @@ from typing import List
 import os
 import tempfile
 
-from app.services.document_processor import process_documents
+from app.core.models import ExtractedData
+
+# from app.services.document_processor import process_documents
 from app.services.llm_service import extract_field_from_document
 
 router = APIRouter()
 
-@router.post("/process-documents", response_model=dict)
-async def process_documents_endpoint(
-    files: List[UploadFile] = File(...)
-):
+
+@router.post("/process-documents", response_model=ExtractedData)
+async def process_documents_endpoint(files: List[UploadFile] = File(...)):
     temp_file_paths = []
     for file in files:
         # Save uploaded file temporarily
@@ -24,13 +25,13 @@ async def process_documents_endpoint(
         temp_file.close()
 
     # Process documents
-    document_data = process_documents(temp_file_paths)
+    # document_data = process_documents(temp_file_paths)
 
     # Extract data from document
-    extracted_data = extract_field_from_document(document_data)
+    extracted_data = extract_field_from_document(temp_file_paths)
 
     # Clean up temp files
     for path in temp_file_paths:
         os.unlink(path)
 
-    return {"extracted_data": extracted_data} 
+    return extracted_data
