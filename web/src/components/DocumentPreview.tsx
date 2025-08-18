@@ -11,12 +11,12 @@ interface DocumentPreviewProps {
 export function DocumentPreview({ document }: DocumentPreviewProps) {
   if (!document) {
     return (
-      <Card>
+      <Card className="h-full flex flex-col">
         <CardHeader>
           <CardTitle>Document Preview</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center h-[600px] border rounded bg-gray-50">
+        <CardContent className="flex-1">
+          <div className="flex items-center justify-center h-full border rounded bg-gray-50">
             <div className="text-center">
               <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
               <p className="text-gray-500">No document selected</p>
@@ -35,11 +35,11 @@ export function DocumentPreview({ document }: DocumentPreviewProps) {
                   file.name.toLowerCase().endsWith('.xlsx') || file.name.toLowerCase().endsWith('.xls');
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>Document Preview</CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 flex-1 flex flex-col">
         {/* Document Information */}
         <div className="p-4 bg-gray-50 rounded-lg border">
           <div className="flex items-start gap-3">
@@ -67,11 +67,11 @@ export function DocumentPreview({ document }: DocumentPreviewProps) {
         </div>
 
         {/* Document Preview */}
-        <div className="border rounded-lg overflow-hidden">
+        <div className="border rounded-lg overflow-hidden flex-1">
           {isPdf ? (
             <iframe
               src={`${document.documentUrl}#toolbar=0&navpanes=0&scrollbar=0`}
-              className="w-full h-[600px]"
+              className="w-full h-full min-h-[500px]"
               title="Document Preview"
               style={{
                 border: 'none',
@@ -79,9 +79,11 @@ export function DocumentPreview({ document }: DocumentPreviewProps) {
               }}
             />
           ) : isExcel ? (
-            <ExcelPreview file={file} />
+            <div className="h-full min-h-[500px]">
+              <ExcelPreview file={file} />
+            </div>
           ) : (
-            <div className="flex items-center justify-center h-[600px] bg-gray-50">
+            <div className="flex items-center justify-center h-full min-h-[500px] bg-gray-50">
               <div className="text-center">
                 <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <p className="text-gray-500 mb-2">{file.name}</p>

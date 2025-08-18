@@ -55,7 +55,7 @@ export function DocumentForm({ formData, totalDocuments, onFormChange }: Documen
   };
 
   return (
-    <Card>
+    <Card className="h-full flex flex-col">
       <CardHeader>
         <CardTitle>
           Extracted Information
@@ -66,7 +66,7 @@ export function DocumentForm({ formData, totalDocuments, onFormChange }: Documen
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="flex-1">
         <form
           onSubmit={(e) => {
             e.preventDefault();

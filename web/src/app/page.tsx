@@ -58,14 +58,18 @@ export default function Home() {
             </div>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.25fr] gap-8">
-            <DocumentForm
-              formData={aggregatedFormData}
-              totalDocuments={documents.length}
-              onFormChange={updateAggregatedFormData}
-            />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 h-auto">
+            <div className="min-h-[700px]">
+              <DocumentForm
+                formData={aggregatedFormData}
+                totalDocuments={documents.length}
+                onFormChange={updateAggregatedFormData}
+              />
+            </div>
             
-            <DocumentPreview document={currentDocument} />
+            <div className="min-h-[700px]">
+              <DocumentPreview document={currentDocument} />
+            </div>
           </div>
         </div>
       </div>

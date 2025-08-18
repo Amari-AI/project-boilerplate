@@ -32,8 +32,6 @@ def extract_text_from_pdf(
                     print("ERROR: PDF is encrypted. Provide a password.")
                     return ""
 
-            print(f"DEBUG: PDF has {len(reader.pages)} pages")
-
             for page_num, page in enumerate(reader.pages):
                 page_text = ""
                 try:
@@ -45,8 +43,6 @@ def extract_text_from_pdf(
 
                 if page_text and page_text.strip():
                     text += f"\n--- Page {page_num+1} ---\n{page_text.strip()}\n"
-                else:
-                    print(f"DEBUG: No text extracted from page {page_num+1}")
 
             # If no text and OCR is enabled
             if not text.strip() and use_ocr:
@@ -57,19 +53,7 @@ def extract_text_from_pdf(
                     if ocr_text.strip():
                         text += f"\n--- OCR Page {i} ---\n{ocr_text.strip()}\n"
 
-            if text.strip():
-                print(f"DEBUG: Total extracted text length: {len(text)} characters")
-                preview = text[:200].replace("\n", " ")
-                print(f"DEBUG: Text preview: {preview}...")
-            else:
-                print("WARNING: No text was extracted from this PDF.")
-                print("This could mean:")
-                print("1. The PDF is scanned (image-based) and requires OCR")
-                print("2. The PDF has unusual formatting or encoding")
-                print("3. The PDF is password-protected or corrupted")
-
     except Exception as e:
-        print(f"ERROR: Failed to extract text from PDF {file_path}: {e}")
         return ""
 
     return text.strip()

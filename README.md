@@ -56,10 +56,13 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run development server
-python -m app.main
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 # Run tests
-pytest
+python3 -m pytest tests/ -v
+
+# Run specific test file
+python3 -m pytest tests/test_document_processor.py -v
 
 # Run evaluation script
 python evaluation.py

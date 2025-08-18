@@ -65,7 +65,7 @@ export function ExcelPreview({ file }: ExcelPreviewProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-[600px]">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading Excel file...</p>
@@ -76,7 +76,7 @@ export function ExcelPreview({ file }: ExcelPreviewProps) {
 
   if (error) {
     return (
-      <div className="flex items-center justify-center h-[600px]">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <p className="text-red-600 mb-2">Error loading Excel file</p>
           <p className="text-gray-500 text-sm">{error}</p>
@@ -87,7 +87,7 @@ export function ExcelPreview({ file }: ExcelPreviewProps) {
 
   if (sheets.length === 0) {
     return (
-      <div className="flex items-center justify-center h-[600px]">
+      <div className="flex items-center justify-center h-full">
         <div className="text-center">
           <p className="text-gray-600">No data found in Excel file</p>
         </div>
@@ -96,7 +96,7 @@ export function ExcelPreview({ file }: ExcelPreviewProps) {
   }
 
   return (
-    <div className="h-[600px] flex flex-col">
+    <div className="h-full flex flex-col">
       {sheets.length > 1 && (
         <div className="flex items-center justify-between p-3 border-b bg-gray-50">
           <Button
