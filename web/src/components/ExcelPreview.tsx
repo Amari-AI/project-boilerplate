@@ -47,7 +47,6 @@ export function ExcelPreview({ file }: ExcelPreviewProps) {
       } catch (err) {
         if (!isCancelled) {
           setError('Failed to load Excel file');
-          // eslint-disable-next-line no-console
           console.error('Excel loading error:', err);
         }
       } finally {

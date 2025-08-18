@@ -46,7 +46,7 @@ export function DocumentForm({ formData, totalDocuments, onFormChange }: Documen
     form.setFieldValue(fieldName, value);
     
     // Create updated form data and notify parent
-    const currentValues = form.getFieldValue('') as DocumentFormData;
+    const currentValues = form.state.values;
     const updatedData = {
       ...currentValues,
       [fieldName]: value,
