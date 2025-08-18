@@ -4,6 +4,6 @@ python-multipart
 PyPDF2
 openpyxl
 requests
-openai
+anthropic
 pytest
 pydantic-settings
