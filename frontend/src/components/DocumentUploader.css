@@ -1,0 +1,51 @@
+.upload-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.dropzone {
+  border: 3px dashed #ddd;
+  border-radius: 20px;
+  padding: 4rem 6rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+  max-width: 600px;
+  width: 100%;
+}
+
+.dropzone:hover {
+  border-color: #667eea;
+  background: #f8f9ff;
+}
+
+.dropzone.active {
+  border-color: #667eea;
+  background: #f0f4ff;
+  transform: scale(1.02);
+}
+
+.dropzone svg {
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.dropzone h2 {
+  color: #333;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.dropzone p {
+  color: #666;
+  margin-bottom: 0.5rem;
+}
+
+.file-types {
+  font-size: 0.9rem;
+  color: #999;
+  margin-top: 1rem;
+}

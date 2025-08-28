@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Processing API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .upload-section {
+            margin: 30px 0;
+        }
+        .file-input {
+            display: block;
+            margin: 20px 0;
+            padding: 10px;
+            border: 2px dashed #ddd;
+            border-radius: 5px;
+            background: #fafafa;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+        .result-box {
+            background: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .field {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 3px;
+        }
+        .field-label {
+            font-weight: bold;
+            color: #666;
+        }
+        .field-value {
+            margin-left: 10px;
+            color: #333;
+        }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            display: none;
+        }
+        .error {
+            color: #d32f2f;
+            background: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success {
+            color: #388e3c;
+            background: #e8f5e9;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shipment Document Processing API</h1>
+        
+        <div class="upload-section">
+            <h2>Upload Documents</h2>
+            <p>Select PDF (Bill of Lading) and Excel (Invoice/Packing List) files for processing:</p>
+            
+            <input type="file" id="fileInput" class="file-input" multiple accept=".pdf,.xlsx,.xls">
+            
+            <button id="processBtn" class="btn" onclick="processDocuments()">
+                Process Documents
+            </button>
+        </div>
+        
+        <div class="loading" id="loading">
+            Processing documents... Please wait.
+        </div>
+        
+        <div class="result-section" id="resultSection">
+            <h2>Extraction Results</h2>
+            
+            <div id="statusMessage"></div>
+            
+            <div class="result-box">
+                <h3>Shipment Data</h3>
+                <div id="shipmentData"></div>
+            </div>
+            
+            <div class="result-box">
+                <h3>Metadata</h3>
+                <div id="metadata"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function processDocuments() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                alert('Please select at least one file');
+                return;
+            }
+            
+            const formData = new FormData();
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            
+            // Show loading, hide results
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultSection').style.display = 'none';
+            document.getElementById('processBtn').disabled = true;
+            
+            try {
+                const response = await fetch('/process-documents', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    displayResults(data);
+                } else {
+                    displayError(data.detail || 'An error occurred');
+                }
+            } catch (error) {
+                displayError('Network error: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('processBtn').disabled = false;
+            }
+        }
+        
+        function displayResults(data) {
+            document.getElementById('resultSection').style.display = 'block';
+            
+            // Status message
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = '<div class="success">Documents processed successfully!</div>';
+            
+            // Shipment data
+            const shipmentDiv = document.getElementById('shipmentData');
+            shipmentDiv.innerHTML = '';
+            
+            const shipmentData = data.shipment_data;
+            const fields = [
+                { label: 'Bill of Lading Number', key: 'bill_of_lading_number' },
+                { label: 'Container Number', key: 'container_number' },
+                { label: 'Consignee Name', key: 'consignee_name' },
+                { label: 'Consignee Address', key: 'consignee_address' },
+                { label: 'Date', key: 'date' },
+                { label: 'Line Items Count', key: 'line_items_count' },
+                { label: 'Average Gross Weight', key: 'average_gross_weight' },
+                { label: 'Average Price', key: 'average_price' }
+            ];
+            
+            fields.forEach(field => {
+                const value = shipmentData[field.key] || 'Not found';
+                shipmentDiv.innerHTML += `
+                    <div class="field">
+                        <span class="field-label">${field.label}:</span>
+                        <span class="field-value">${value}</span>
+                    </div>
+                `;
+            });
+            
+            // Metadata
+            const metadataDiv = document.getElementById('metadata');
+            metadataDiv.innerHTML = `
+                <div class="field">
+                    <span class="field-label">Files Processed:</span>
+                    <span class="field-value">${data.metadata.total_files_processed}</span>
+                </div>
+                <div class="field">
+                    <span class="field-label">File Types:</span>
+                    <span class="field-value">${data.metadata.file_types.join(', ')}</span>
+                </div>
+            `;
+        }
+        
+        function displayError(error) {
+            document.getElementById('resultSection').style.display = 'block';
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.innerHTML = `<div class="error">Error: ${error}</div>`;
+            document.getElementById('shipmentData').innerHTML = '';
+            document.getElementById('metadata').innerHTML = '';
+        }
+    </script>
+</body>
+</html>

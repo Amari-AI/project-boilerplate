@@ -1,0 +1,260 @@
+.document-viewer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.viewer-header {
+  background: white;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #e2e8f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.viewer-header h3 {
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.viewer-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-btn, .download-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.nav-btn:hover:not(:disabled), .download-btn:hover {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+.nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.doc-info {
+  padding: 0 1rem;
+  color: #4a5568;
+  font-size: 0.95rem;
+}
+
+.document-content {
+  flex: 1;
+  padding: 1.5rem;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.no-documents {
+  justify-content: center;
+  align-items: center;
+  color: #718096;
+  text-align: center;
+}
+
+.no-documents svg {
+  color: #cbd5e0;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  text-align: center;
+  color: #667eea;
+  padding: 2rem;
+}
+
+.pdf-container {
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.page-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e2e8f0;
+}
+
+.page-controls button {
+  padding: 0.5rem 1rem;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.page-controls button:hover:not(:disabled) {
+  background: #5a67d8;
+}
+
+.page-controls button:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+}
+
+.excel-preview {
+  background: white;
+  padding: 3rem;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.excel-preview svg {
+  color: #48bb78;
+  margin-bottom: 1rem;
+}
+
+.pdf-error {
+  text-align: center;
+  padding: 2rem;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.pdf-error svg {
+  color: #e53e3e;
+  margin-bottom: 1rem;
+}
+
+.pdf-error p {
+  color: #718096;
+  margin-bottom: 1rem;
+}
+
+.excel-preview h4 {
+  color: #333;
+  margin: 1rem 0;
+}
+
+.excel-preview p {
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.download-excel-btn {
+  padding: 0.75rem 1.5rem;
+  background: #48bb78;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.download-excel-btn:hover {
+  background: #38a169;
+}
+
+/* Simple Document Viewer Styles */
+.document-preview {
+  text-align: center;
+  padding: 2rem;
+}
+
+.document-icon {
+  margin-bottom: 1.5rem;
+}
+
+.document-icon svg {
+  color: #667eea;
+}
+
+.document-preview h3 {
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.document-type {
+  color: #718096;
+  margin-bottom: 2rem;
+}
+
+.document-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.view-btn {
+  background: #667eea;
+  color: white;
+}
+
+.view-btn:hover {
+  background: #5a67d8;
+}
+
+.download-btn {
+  background: #48bb78;
+  color: white;
+}
+
+.download-btn:hover {
+  background: #38a169;
+}
+
+.pdf-embed {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* React PDF Styles */
+.react-pdf__Page {
+  margin: 0 auto;
+}
+
+.react-pdf__Page__canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.react-pdf__Page__textContent {
+  border: 1px solid transparent;
+}
+
+.react-pdf__Page__annotations {
+  height: 0;
+}
