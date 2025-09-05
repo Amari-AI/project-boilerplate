@@ -49,17 +49,28 @@ def extract_field_from_document(document_data):
     
     try:
         prompt = f"""
-        Analyze the following document data and extract key information in a structured format.
-        Keep your response concise and under 200 words:
+        You are a form data extraction expert. Analyze the following document and extract ALL form fields, labels, and their values. 
+        Look for boxes, fields, labels, and any structured data entry areas.
         
-        {combined_text[:3000]}
+        Document content:
+        {combined_text[:4000]}
         
-        Provide a brief summary including:
-        1. Document type
-        2. Key data points (max 3-4 items)
-        3. Brief summary (2-3 sentences max)
+        Return the extracted data as a JSON object with this exact structure:
+        {{
+            "document_type": "type of document (e.g., Bill of Lading, Commercial Invoice, etc.)",
+            "extracted_fields": {{
+                "field_name_1": "extracted_value_1",
+                "field_name_2": "extracted_value_2",
+                "field_name_3": "extracted_value_3"
+            }}
+        }}
         
-        Format your response clearly with bullet points or short paragraphs.
+        Instructions:
+        - Extract ALL visible form fields, even if empty
+        - Use descriptive field names (e.g., "shipper_name", "consignee_address", "weight", "date")
+        - If a field is empty, use empty string ""
+        - Look for common shipping document fields: shipper, consignee, notify party, description of goods, weight, dimensions, dates, reference numbers
+        - Return ONLY the JSON object, no additional text
         """
 
         if client_type == "openai":
@@ -69,7 +80,7 @@ def extract_field_from_document(document_data):
                     {"role": "system", "content": "You are a document processing assistant that extracts and summarizes key information from business documents."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=200,
+                max_tokens=800,
                 temperature=0.3
             )
             processed_text = response.choices[0].message.content.strip()
@@ -77,7 +88,7 @@ def extract_field_from_document(document_data):
         elif client_type == "anthropic":
             response = client.messages.create(
                 model="claude-3-haiku-20240307",
-                max_tokens=200,
+                max_tokens=800,
                 temperature=0.3,
                 system="You are a document processing assistant that extracts and summarizes key information from business documents.",
                 messages=[
@@ -86,12 +97,21 @@ def extract_field_from_document(document_data):
             )
             processed_text = response.content[0].text.strip()
         
-        # Convert literal \n to actual newlines for proper formatting
-        processed_text = processed_text.replace('\\n', '\n')
-        
-        # Truncate response if it's too long (safety measure)
-        if len(processed_text) > 800:
-            processed_text = processed_text[:800] + "..."
+        # Try to parse as JSON, fallback to plain text if it fails
+        import json
+        try:
+            parsed_data = json.loads(processed_text.strip())
+            return {
+                "status": "success",
+                "message": "Documents processed successfully",
+                "extracted_data": document_data,
+                "structured_data": parsed_data
+            }
+        except json.JSONDecodeError:
+            # Fallback to plain text if JSON parsing fails
+            processed_text = processed_text.replace('\\n', '\n')
+            if len(processed_text) > 800:
+                processed_text = processed_text[:800] + "..."
         
         return {
             "status": "success",

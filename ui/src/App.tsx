@@ -1,11 +1,17 @@
 import { useState, useRef } from 'react'
 import './App.css'
 
+interface StructuredData {
+  document_type: string
+  extracted_fields: Record<string, string>
+}
+
 interface ProcessResult {
   status: string
   message: string
   extracted_data?: Record<string, unknown>
   processed_data?: string
+  structured_data?: StructuredData
 }
 
 interface ErrorResult {
@@ -18,6 +24,7 @@ function App() {
   const [files, setFiles] = useState<File[]>([])
   const [processing, setProcessing] = useState(false)
   const [result, setResult] = useState<Result | null>(null)
+  const [formData, setFormData] = useState<Record<string, string>>({})
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,6 +70,13 @@ function App() {
     setFiles(files.filter((_, i) => i !== index))
   }
 
+  const handleFormFieldChange = (fieldName: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [fieldName]: value
+    }))
+  }
+
   const processFiles = async () => {
     if (files.length === 0) return
     
@@ -83,6 +97,10 @@ function App() {
       if (response.ok) {
         const data = await response.json()
         setResult(data)
+        // Initialize form data with extracted fields if available
+        if (data.structured_data?.extracted_fields) {
+          setFormData(data.structured_data.extracted_fields)
+        }
       } else {
         setResult({ error: 'Failed to process files' })
       }
@@ -146,18 +164,52 @@ function App() {
             <div className="error">Error: {result.error}</div>
           ) : (
             <div className="result-content">
-              <div className="status">
-                <strong>Status:</strong> {result.status.toUpperCase()}
+              <div className="status-message">
+                <span className="status-badge">{result.status.toUpperCase()}</span>
+                <span className="message">{result.message}</span>
               </div>
-              <div className="message">
-                <strong>Message:</strong> {result.message}
-              </div>
-              {result.processed_data && (
+              
+              {result.structured_data ? (
+                <div className="form-container">
+                  <div className="document-type">
+                    <h4>📄 {result.structured_data.document_type}</h4>
+                  </div>
+                  <div className="extracted-form">
+                    <h4>📝 Extracted Information</h4>
+                    <p>Review and edit the extracted data below:</p>
+                    <form className="google-form">
+                      {Object.entries(formData).map(([fieldName, fieldValue]) => (
+                        <div key={fieldName} className="form-field">
+                          <label htmlFor={fieldName} className="form-label">
+                            {fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          </label>
+                          <input
+                            type="text"
+                            id={fieldName}
+                            value={fieldValue}
+                            onChange={(e) => handleFormFieldChange(fieldName, e.target.value)}
+                            className="form-input"
+                            placeholder={`Enter ${fieldName.replace(/_/g, ' ')}`}
+                          />
+                        </div>
+                      ))}
+                      <div className="form-actions">
+                        <button type="button" className="save-btn">
+                          💾 Save Changes
+                        </button>
+                        <button type="button" className="export-btn">
+                          📥 Export Data
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              ) : result.processed_data ? (
                 <div className="processed-data">
                   <strong>Processed Data:</strong>
                   <pre className="formatted-text">{result.processed_data}</pre>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
         </div>
