@@ -162,25 +162,6 @@ function App() {
     jsonLink.download = `extracted_data_${result.structured_data.document_type.replace(/\s+/g, '_').toLowerCase()}_${new Date().getTime()}.json`
     jsonLink.click()
     URL.revokeObjectURL(jsonUrl)
-
-    // Also create CSV file
-    const csvHeaders = ['Field Name', 'Field Value']
-    const csvRows = Object.entries(formData).map(([key, value]) => [
-      key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      `"${value.replace(/"/g, '""')}"`
-    ])
-    const csvContent = [
-      csvHeaders.join(','),
-      ...csvRows.map(row => row.join(','))
-    ].join('\n')
-
-    const csvBlob = new Blob([csvContent], { type: 'text/csv' })
-    const csvUrl = URL.createObjectURL(csvBlob)
-    const csvLink = document.createElement('a')
-    csvLink.href = csvUrl
-    csvLink.download = `extracted_data_${result.structured_data.document_type.replace(/\s+/g, '_').toLowerCase()}_${new Date().getTime()}.csv`
-    csvLink.click()
-    URL.revokeObjectURL(csvUrl)
   }
 
   const processFiles = async () => {
