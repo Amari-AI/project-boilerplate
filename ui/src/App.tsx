@@ -4,7 +4,7 @@ import './App.css'
 function App() {
   const [files, setFiles] = useState<File[]>([])
   const [processing, setProcessing] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{ error?: string; [key: string]: unknown } | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +73,7 @@ function App() {
       } else {
         setResult({ error: 'Failed to process files' })
       }
-    } catch (error) {
+    } catch {
       setResult({ error: 'Network error' })
     } finally {
       setProcessing(false)
