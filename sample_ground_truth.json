@@ -1,0 +1,23 @@
+[
+  {
+    "document_type": "invoice",
+    "invoice_number": "INV-001",
+    "date": "2024-01-15",
+    "amount": "1500.00",
+    "vendor": "ACME Corp"
+  },
+  {
+    "document_type": "bill_of_lading",
+    "bol_number": "BOL-12345",
+    "shipper": "Global Shipping",
+    "consignee": "ABC Company",
+    "weight": "2500 lbs"
+  },
+  {
+    "document_type": "invoice",
+    "invoice_number": "INV-002",
+    "date": "2024-01-16",
+    "amount": "750.50",
+    "vendor": "XYZ Limited"
+  }
+]

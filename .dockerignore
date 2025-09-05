@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+.env
+*.egg-info/
+.pytest_cache/
+
+# Node
+ui/node_modules/
+ui/dist/
+ui/.env
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.log
+test_*.py
+test_sample.txt
+
+# Documentation
+README.md
+*.md

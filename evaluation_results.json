@@ -1,0 +1,26 @@
+{
+  "overall_metrics": {
+    "accuracy": 0.9333333333333332,
+    "precision": 0.9333333333333333,
+    "recall": 1.0,
+    "f1_score": 0.9655172413793104
+  },
+  "confusion_matrix": {
+    "true_positives": 14,
+    "false_positives": 1,
+    "true_negatives": 0,
+    "false_negatives": 0
+  },
+  "total_samples": 3,
+  "field_level_accuracy": {
+    "amount": 1.0,
+    "document_type": 1.0,
+    "vendor": 0.5,
+    "date": 1.0,
+    "invoice_number": 1.0,
+    "weight": 1.0,
+    "consignee": 1.0,
+    "bol_number": 1.0,
+    "shipper": 1.0
+  }
+}
