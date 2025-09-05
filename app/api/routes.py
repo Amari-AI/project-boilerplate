@@ -27,10 +27,10 @@ async def process_documents_endpoint(
     document_data = process_documents(temp_file_paths)
 
     # Extract data from document
-    extracted_data = extract_field_from_document(document_data)
+    result = extract_field_from_document(document_data)
 
     # Clean up temp files
     for path in temp_file_paths:
         os.unlink(path)
 
-    return {"extracted_data": extracted_data} 
+    return result 
