@@ -1,0 +1,10 @@
+.git
+node_modules
+.next
+.turbo
+.vercel
+.cache
+.swc
+.eslintcache
+Dockerfile*
+**/.DS_Store
