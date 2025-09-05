@@ -75,7 +75,7 @@ function App() {
   }
 
   // Utility function to handle object values properly
-  const formatFieldValue = (value: null | undefined): string => {
+  const formatFieldValue = (value: unknown): string => {
     if (value === null || value === undefined) {
       return ''
     }
@@ -106,7 +106,7 @@ function App() {
   }
 
   // Function to render form fields based on the data type
-  const renderFormField = (fieldName: string, fieldValue: null | undefined) => {
+  const renderFormField = (fieldName: string, fieldValue: unknown) => {
     const formattedValue = formatFieldValue(fieldValue)
     const currentValue = formData[fieldName] || formattedValue
     

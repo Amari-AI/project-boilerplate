@@ -138,7 +138,8 @@ def extract_field_from_pdf_files(file_paths):
                             - Use clean, descriptive field names (e.g., "shipper_name", "consignee_address", "weight", "date")
                             - Look for common shipping document fields: shipper, consignee, notify party, description of goods, weight, dimensions, dates, reference numbers
                             - ALL field values must be simple strings or numbers - NO nested objects or arrays
-                            - Do NOT prefix field names with file types like "pdf_", "excel_", etc.
+                            - Do NOT prefix field names with file types like "pdf", "excel", etc.
+                            - If you have a field that contains an object, split it up into multiple fields instead
                             - If you find multiple related values, combine them into a single string separated by commas
                             - Return ONLY the JSON object, no additional text
                             """
