@@ -28,11 +28,18 @@ async def process_documents_endpoint(
     # Check if we have PDF files to process directly with Claude
     pdf_files = [path for path in temp_file_paths if path.lower().endswith('.pdf')]
     
+    print(f"DEBUG API: Total files: {len(temp_file_paths)}")
+    print(f"DEBUG API: File paths: {temp_file_paths}")
+    print(f"DEBUG API: PDF files found: {len(pdf_files)}")
+    print(f"DEBUG API: PDF paths: {pdf_files}")
+    
     if pdf_files:
         # Use Claude's native PDF processing for PDF files
+        print("DEBUG API: Using Claude PDF processing")
         result = extract_field_from_pdf_files(pdf_files)
     else:
         # Fallback to text-based processing for other files
+        print("DEBUG API: Using text-based processing (fallback)")
         document_data = process_documents(temp_file_paths)
         result = extract_field_from_document(document_data)
 
