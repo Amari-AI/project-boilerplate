@@ -1,10 +1,23 @@
 import { useState, useRef } from 'react'
 import './App.css'
 
+interface ProcessResult {
+  status: string
+  message: string
+  extracted_data?: Record<string, unknown>
+  processed_data?: string
+}
+
+interface ErrorResult {
+  error: string
+}
+
+type Result = ProcessResult | ErrorResult
+
 function App() {
   const [files, setFiles] = useState<File[]>([])
   const [processing, setProcessing] = useState(false)
-  const [result, setResult] = useState<{ error?: string; [key: string]: unknown } | null>(null)
+  const [result, setResult] = useState<Result | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -129,15 +142,15 @@ function App() {
       {result && (
         <div className="result">
           <h3>Results</h3>
-          {result?.error ? (
-            <div className="error">Error: {result?.error}</div>
+          {'error' in result ? (
+            <div className="error">Error: {result.error}</div>
           ) : (
             <div className="result-content">
               <div className="status">
-                <strong>Status:</strong> {result?.status.toUpperCase()}
+                <strong>Status:</strong> {result.status.toUpperCase()}
               </div>
               <div className="message">
-                <strong>Message:</strong> {result?.message}
+                <strong>Message:</strong> {result.message}
               </div>
               {result.processed_data && (
                 <div className="processed-data">
