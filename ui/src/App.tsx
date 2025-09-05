@@ -35,10 +35,8 @@ function App() {
         const fileType = file.type
         const fileName = file.name.toLowerCase()
         return fileType === 'application/pdf' || 
-               fileType === 'application/vnd.ms-excel' ||
                fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
                fileName.endsWith('.pdf') || 
-               fileName.endsWith('.xls') || 
                fileName.endsWith('.xlsx')
       })
       setFiles(validFiles)
@@ -57,10 +55,8 @@ function App() {
         const fileType = file.type
         const fileName = file.name.toLowerCase()
         return fileType === 'application/pdf' || 
-               fileType === 'application/vnd.ms-excel' ||
                fileType === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
                fileName.endsWith('.pdf') || 
-               fileName.endsWith('.xls') || 
                fileName.endsWith('.xlsx')
       })
       setFiles(validFiles)
@@ -215,13 +211,13 @@ function App() {
             <div className="upload-content">
               <div className="upload-icon">📁</div>
               <p>Drag and drop files here or click to browse</p>
-              <p className="file-types">Supported: PDF, XLS, XLSX</p>
+              <p className="file-types">Supported: PDF, XLSX</p>
             </div>
             <input
               ref={fileInputRef}
               type="file"
               multiple
-              accept=".pdf,.xls,.xlsx,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              accept=".pdf,.xlsx,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               onChange={handleFileSelect}
               style={{ display: 'none' }}
             />

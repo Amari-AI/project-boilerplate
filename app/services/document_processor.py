@@ -1,6 +1,7 @@
 import os
 from app.utils.pdf_utils import extract_text_from_pdf
 from app.utils.excel_utils import extract_data_from_excel, format_excel_data_for_llm
+from app.utils.csv_utils import extract_data_from_csv, format_csv_data_for_llm
 
 def process_documents(file_paths):
     """
@@ -26,11 +27,20 @@ def process_documents(file_paths):
             extracted_data[f'pdf_{filename}'] = pdf_text
             all_text += f"\n\nDocument: {filename}\n{pdf_text}"
             
-        elif file_path.lower().endswith((".xlsx", ".xls")):
+        elif file_path.lower().endswith(".xlsx"):
             excel_data = extract_data_from_excel(file_path)
             formatted_excel = format_excel_data_for_llm(excel_data)
             extracted_data[f'excel_{filename}'] = formatted_excel
             all_text += f"\n\nDocument: {filename}\n{formatted_excel}"
+            
+        elif file_path.lower().endswith(".csv"):
+            print(f"DEBUG: Processing CSV: {file_path}")
+            csv_data = extract_data_from_csv(file_path)
+            formatted_csv = format_csv_data_for_llm(csv_data)
+            print(f"DEBUG: CSV data rows: {csv_data.get('row_count', 0)}")
+            print(f"DEBUG: CSV columns: {csv_data.get('columns', [])}")
+            extracted_data[f'csv_{filename}'] = formatted_csv
+            all_text += f"\n\nDocument: {filename}\n{formatted_csv}"
     
     extracted_data['combined_text'] = all_text
     return extracted_data 

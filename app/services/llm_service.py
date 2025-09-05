@@ -137,13 +137,186 @@ def extract_field_from_pdf_files(file_paths):
         }
 
 
+def extract_field_from_document_with_structured_prompt(document_data):
+    """
+    Use LLM to extract structured data from CSV/Excel files.
+    
+    Args:
+        document_data: Dictionary containing extracted document data
+        
+    Returns:
+        dict: Extracted and processed data
+    """
+    print(f"DEBUG: Processing structured document data with Claude")
+    
+    # If no API key is configured, return error
+    if not client or client_type != "anthropic":
+        return {
+            "status": "error",
+            "message": "Claude processing requires Anthropic API key",
+            "extracted_data": document_data
+        }
+    
+    # Use the combined text for LLM processing
+    combined_text = document_data.get('combined_text', '')
+    
+    if not combined_text.strip():
+        return {
+            "status": "error",
+            "message": "No text could be extracted from the uploaded documents",
+            "extracted_data": document_data
+        }
+
+    try:
+        prompt = f"""
+        Analyze this CSV/Excel document data and extract key information in a structured format:
+
+        {combined_text[:8000]}
+        
+        Return ONLY a JSON object with this exact structure:
+        {{
+            "document_type": "type of document (e.g., Invoice List, Customer Data, Shipment Records, etc.)",
+            "extracted_fields": {{
+                "key_field_1": "value_1",
+                "key_field_2": "value_2"
+            }}
+        }}
+        
+        Instructions:
+        - Identify the main purpose/type of this data
+        - Extract the most important fields and their common values
+        - If it's tabular data, summarize key patterns or totals
+        - Use descriptive field names based on the column headers
+        - DO NOT invent data - only extract what's clearly present
+        - Return ONLY the JSON object, no additional text
+        """
+
+        response = client.messages.create(
+            model="claude-3-5-sonnet-20241022",
+            max_tokens=1000,
+            messages=[
+                {
+                    "role": "user", 
+                    "content": prompt
+                }
+            ]
+        )
+        
+        processed_text = response.content[0].text.strip()
+        print(f"DEBUG: Claude response for CSV/Excel: {processed_text[:300]}...")
+        
+        # Try to parse JSON response
+        import json
+        try:
+            parsed_data = json.loads(processed_text)
+            return {
+                "status": "success",
+                "message": "CSV/Excel processed successfully with Claude",
+                "extracted_data": document_data,
+                "structured_data": parsed_data
+            }
+        except json.JSONDecodeError as e:
+            print(f"DEBUG: JSON parsing failed: {e}")
+            return {
+                "status": "success",
+                "message": "CSV/Excel processed but JSON parsing failed", 
+                "extracted_data": document_data,
+                "structured_data": {
+                    "document_type": "Data File",
+                    "extracted_fields": {
+                        "raw_response": processed_text[:500] + ("..." if len(processed_text) > 500 else "")
+                    }
+                }
+            }
+        
+    except Exception as e:
+        print(f"ERROR: Claude CSV/Excel processing failed: {e}")
+        return {
+            "status": "error",
+            "message": f"CSV/Excel processing failed: {str(e)}",
+            "extracted_data": document_data
+        }
+
+
+def process_mixed_documents(pdf_files, excel_files):
+    """
+    Process both PDF and Excel files together, combining their extracted data.
+    
+    Args:
+        pdf_files: List of PDF file paths
+        excel_files: List of Excel file paths
+        
+    Returns:
+        dict: Combined extracted and processed data
+    """
+    print(f"DEBUG: Processing mixed documents - {len(pdf_files)} PDFs, {len(excel_files)} Excel files")
+    
+    if not client or client_type != "anthropic":
+        return {
+            "status": "error",
+            "message": "Mixed document processing requires Anthropic API key",
+            "extracted_data": {}
+        }
+    
+    try:
+        # Process PDF files with Claude native processing
+        pdf_results = []
+        for pdf_path in pdf_files:
+            pdf_result = extract_field_from_pdf_files([pdf_path])
+            if pdf_result.get('structured_data'):
+                pdf_results.append(pdf_result['structured_data'])
+        
+        # Process Excel files with text-based processing
+        from app.services.document_processor import process_documents
+        excel_document_data = process_documents(excel_files)
+        excel_result = extract_field_from_document_with_structured_prompt(excel_document_data)
+        
+        # Combine the results
+        combined_fields = {}
+        document_types = []
+        
+        # Add PDF fields
+        for pdf_data in pdf_results:
+            document_types.append(pdf_data.get('document_type', 'PDF Document'))
+            combined_fields.update(pdf_data.get('extracted_fields', {}))
+        
+        # Add Excel fields
+        if excel_result.get('structured_data'):
+            excel_data = excel_result['structured_data']
+            document_types.append(excel_data.get('document_type', 'Excel Document'))
+            
+            # Prefix Excel fields to avoid conflicts
+            excel_fields = excel_data.get('extracted_fields', {})
+            for key, value in excel_fields.items():
+                prefixed_key = f"excel_{key}" if key not in combined_fields else f"excel_{key}"
+                combined_fields[prefixed_key] = value
+        
+        return {
+            "status": "success",
+            "message": f"Mixed documents processed successfully - {len(pdf_files)} PDF(s), {len(excel_files)} Excel file(s)",
+            "extracted_data": {"mixed_processing": True},
+            "structured_data": {
+                "document_type": " + ".join(document_types) if document_types else "Mixed Documents",
+                "extracted_fields": combined_fields
+            }
+        }
+        
+    except Exception as e:
+        print(f"ERROR: Mixed document processing failed: {e}")
+        return {
+            "status": "error",
+            "message": f"Mixed document processing failed: {str(e)}",
+            "extracted_data": {}
+        }
+
+
 def extract_field_from_document(document_data):
     """
     Legacy function for backward compatibility - now just returns error for text-based processing
     """
     return {
         "status": "error",
-        "message": "Text-based processing deprecated - use PDF direct processing instead",
+        "message": "Text-based processing deprecated - use structured processing instead", 
         "extracted_data": document_data
     }
     
