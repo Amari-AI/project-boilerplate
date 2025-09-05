@@ -19,7 +19,10 @@ def process_documents(file_paths):
         filename = os.path.basename(file_path)
         
         if file_path.lower().endswith(".pdf"):
+            print(f"DEBUG: Processing PDF: {file_path}")
             pdf_text = extract_text_from_pdf(file_path)
+            print(f"DEBUG: PDF text length: {len(pdf_text)}")
+            print(f"DEBUG: PDF text sample: {pdf_text[:200]}")
             extracted_data[f'pdf_{filename}'] = pdf_text
             all_text += f"\n\nDocument: {filename}\n{pdf_text}"
             

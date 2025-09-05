@@ -17,6 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.middleware("http")
+async def log_requests(request, call_next):
+    print(f"DEBUG MIDDLEWARE: {request.method} {request.url}")
+    response = await call_next(request)
+    return response
+
 app.include_router(router)
 
 @app.get("/")
