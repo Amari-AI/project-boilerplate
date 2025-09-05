@@ -129,7 +129,7 @@ function App() {
       {result && (
         <div className="result">
           <h3>Results:</h3>
-          <pre>{JSON.stringify(result, null, 2)}</pre>
+          <div>{JSON.stringify(result, null, 2)}</div>
         </div>
       )}
     </div>

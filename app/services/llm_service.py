@@ -49,14 +49,17 @@ def extract_field_from_document(document_data):
     
     try:
         prompt = f"""
-        Analyze the following document data and extract key information in a structured format:
+        Analyze the following document data and extract key information in a structured format.
+        Keep your response concise and under 200 words:
         
-        {combined_text[:4000]}  # Limit to avoid token limits
+        {combined_text[:3000]}
         
-        Please provide:
-        1. Document types found
-        2. Key data points extracted
-        3. Summary of important information
+        Provide a brief summary including:
+        1. Document type
+        2. Key data points (max 3-4 items)
+        3. Brief summary (2-3 sentences max)
+        
+        Format your response clearly with bullet points or short paragraphs.
         """
 
         if client_type == "openai":
@@ -66,7 +69,7 @@ def extract_field_from_document(document_data):
                     {"role": "system", "content": "You are a document processing assistant that extracts and summarizes key information from business documents."},
                     {"role": "user", "content": prompt}
                 ],
-                max_tokens=500,
+                max_tokens=200,
                 temperature=0.3
             )
             processed_text = response.choices[0].message.content.strip()
@@ -74,7 +77,7 @@ def extract_field_from_document(document_data):
         elif client_type == "anthropic":
             response = client.messages.create(
                 model="claude-3-haiku-20240307",
-                max_tokens=500,
+                max_tokens=200,
                 temperature=0.3,
                 system="You are a document processing assistant that extracts and summarizes key information from business documents.",
                 messages=[
@@ -82,6 +85,13 @@ def extract_field_from_document(document_data):
                 ]
             )
             processed_text = response.content[0].text.strip()
+        
+        # Convert literal \n to actual newlines for proper formatting
+        processed_text = processed_text.replace('\\n', '\n')
+        
+        # Truncate response if it's too long (safety measure)
+        if len(processed_text) > 800:
+            processed_text = processed_text[:800] + "..."
         
         return {
             "status": "success",
