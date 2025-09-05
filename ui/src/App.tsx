@@ -77,6 +77,12 @@ function App() {
     }))
   }
 
+  const startOver = () => {
+    setResult(null)
+    setFiles([])
+    setFormData({})
+  }
+
   const processFiles = async () => {
     if (files.length === 0) return
     
@@ -113,106 +119,119 @@ function App() {
 
   return (
     <div className="app">
-      <h1>Document Processing</h1>
-      <p>Upload PDF and Excel files for processing</p>
       
-      <div 
-        className="upload-zone"
-        onDragOver={handleDragOver}
-        onDrop={handleDrop}
-        onClick={() => fileInputRef.current?.click()}
-      >
-        <div className="upload-content">
-          <div className="upload-icon">📁</div>
-          <p>Drag and drop files here or click to browse</p>
-          <p className="file-types">Supported: PDF, XLS, XLSX</p>
-        </div>
-        <input
-          ref={fileInputRef}
-          type="file"
-          multiple
-          accept=".pdf,.xls,.xlsx,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-          onChange={handleFileSelect}
-          style={{ display: 'none' }}
-        />
-      </div>
-
-      {files.length > 0 && (
-        <div className="file-list">
-          <h3>Selected Files:</h3>
-          {files.map((file, index) => (
-            <div key={index} className="file-item">
-              <span className="file-name">{file.name}</span>
-              <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
-              <button onClick={() => removeFile(index)} className="remove-btn">×</button>
-            </div>
-          ))}
-          <button 
-            onClick={processFiles} 
-            disabled={processing}
-            className="process-btn"
+      {!result && (
+        <>
+          <h1>Document Processing</h1>
+          <p>Upload PDF and Excel files for processing</p>
+          
+          <div 
+            className="upload-zone"
+            onDragOver={handleDragOver}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
           >
-            {processing ? 'Processing...' : 'Process Files'}
-          </button>
-        </div>
+            <div className="upload-content">
+              <div className="upload-icon">📁</div>
+              <p>Drag and drop files here or click to browse</p>
+              <p className="file-types">Supported: PDF, XLS, XLSX</p>
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept=".pdf,.xls,.xlsx,application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              onChange={handleFileSelect}
+              style={{ display: 'none' }}
+            />
+          </div>
+
+          {files.length > 0 && (
+            <div className="file-list">
+              <h3>Selected Files:</h3>
+              {files.map((file, index) => (
+                <div key={index} className="file-item">
+                  <span className="file-name">{file.name}</span>
+                  <span className="file-size">({(file.size / 1024 / 1024).toFixed(2)} MB)</span>
+                  <button onClick={() => removeFile(index)} className="remove-btn">×</button>
+                </div>
+              ))}
+              <button 
+                onClick={processFiles} 
+                disabled={processing}
+                className="process-btn"
+              >
+                {processing ? 'Processing...' : 'Process Files'}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {result && (
-        <div className="result">
-          <h3>Results</h3>
-          {'error' in result ? (
-            <div className="error">Error: {result.error}</div>
-          ) : (
-            <div className="result-content">
-              <div className="status-message">
-                <span className="status-badge">{result.status.toUpperCase()}</span>
-                <span className="message">{result.message}</span>
-              </div>
-              
-              {result.structured_data ? (
-                <div className="form-container">
-                  <div className="document-type">
-                    <h4>📄 {result.structured_data.document_type}</h4>
-                  </div>
-                  <div className="extracted-form">
-                    <h4>📝 Extracted Information</h4>
-                    <p>Review and edit the extracted data below:</p>
-                    <form className="google-form">
-                      {Object.entries(formData).map(([fieldName, fieldValue]) => (
-                        <div key={fieldName} className="form-field">
-                          <label htmlFor={fieldName} className="form-label">
-                            {fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                          </label>
-                          <input
-                            type="text"
-                            id={fieldName}
-                            value={fieldValue}
-                            onChange={(e) => handleFormFieldChange(fieldName, e.target.value)}
-                            className="form-input"
-                            placeholder={`Enter ${fieldName.replace(/_/g, ' ')}`}
-                          />
-                        </div>
-                      ))}
-                      <div className="form-actions">
-                        <button type="button" className="save-btn">
-                          💾 Save Changes
-                        </button>
-                        <button type="button" className="export-btn">
-                          📥 Export Data
-                        </button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              ) : result.processed_data ? (
-                <div className="processed-data">
-                  <strong>Processed Data:</strong>
-                  <pre className="formatted-text">{result.processed_data}</pre>
-                </div>
-              ) : null}
+        <>
+          <h1>Edit Info</h1>
+          <div className="result">
+            <div className="result-header">
+              <h3>Results</h3>
+              <button onClick={startOver} className="start-over-btn">
+                🔄 Start Over
+              </button>
             </div>
-          )}
-        </div>
+            {'error' in result ? (
+              <div className="error">Error: {result.error}</div>
+            ) : (
+              <div className="result-content">
+                <div className="status-message">
+                  <span className="status-badge">{result.status.toUpperCase()}</span>
+                  <span className="message">{result.message}</span>
+                </div>
+                
+                {result.structured_data ? (
+                  <div className="form-container">
+                    <div className="document-type">
+                      <h4>📄 {result.structured_data.document_type}</h4>
+                    </div>
+                    <div className="extracted-form">
+                      <h4>📝 Extracted Information</h4>
+                      <p>Review and edit the extracted data below:</p>
+                      <form className="google-form">
+                        {Object.entries(formData).map(([fieldName, fieldValue]) => (
+                          <div key={fieldName} className="form-field">
+                            <label htmlFor={fieldName} className="form-label">
+                              {fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                            </label>
+                            <input
+                              type="text"
+                              id={fieldName}
+                              value={fieldValue}
+                              onChange={(e) => handleFormFieldChange(fieldName, e.target.value)}
+                              className="form-input"
+                              placeholder={`Enter ${fieldName.replace(/_/g, ' ')}`}
+                            />
+                          </div>
+                        ))}
+                        <div className="form-actions">
+                          <button type="button" className="save-btn">
+                            💾 Save Changes
+                          </button>
+                          <button type="button" className="export-btn">
+                            📥 Export Data
+                          </button>
+                        </div>
+                      </form>
+                    </div>
+                  </div>
+                ) : result.processed_data ? (
+                  <div className="processed-data">
+                    <strong>Processed Data:</strong>
+                    <pre className="formatted-text">{result.processed_data}</pre>
+                  </div>
+                ) : null}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   )
