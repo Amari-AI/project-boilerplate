@@ -128,8 +128,25 @@ function App() {
 
       {result && (
         <div className="result">
-          <h3>Results:</h3>
-          <div>{JSON.stringify(result, null, 2)}</div>
+          <h3>Results</h3>
+          {result?.error ? (
+            <div className="error">Error: {result?.error}</div>
+          ) : (
+            <div className="result-content">
+              <div className="status">
+                <strong>Status:</strong> {result?.status.toUpperCase()}
+              </div>
+              <div className="message">
+                <strong>Message:</strong> {result?.message}
+              </div>
+              {result.processed_data && (
+                <div className="processed-data">
+                  <strong>Processed Data:</strong>
+                  <pre className="formatted-text">{result.processed_data}</pre>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
