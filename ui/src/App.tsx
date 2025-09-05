@@ -143,9 +143,7 @@ function App() {
     const exportObject = {
       document_type: result.structured_data.document_type,
       extracted_fields: formData, // Use current form data (including any edits)
-      exported_at: new Date().toISOString(),
-      processing_status: result.status,
-      processing_message: result.message
+      exported_at: new Date().toISOString()
     }
 
     // Create and download JSON file
