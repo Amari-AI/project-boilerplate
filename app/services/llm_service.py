@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+load_dotenv()
+
 from openai import OpenAI
 from anthropic import Anthropic
 from app.core.config import settings
