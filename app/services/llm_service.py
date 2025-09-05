@@ -17,6 +17,52 @@ else:
     client_type = None
 
 
+def clean_and_merge_fields(extracted_fields):
+    """
+    Clean field names by removing file type prefixes and merge duplicates.
+    
+    Args:
+        extracted_fields: Dictionary of field names to values
+        
+    Returns:
+        dict: Cleaned fields with merged duplicates
+    """
+    cleaned_fields = {}
+    
+    for field_name, field_value in extracted_fields.items():
+        # Remove file type prefixes
+        clean_name = field_name
+        prefixes_to_remove = ['excel_', 'pdf_', 'csv_', 'xlsx_', 'doc_', 'document_']
+        
+        for prefix in prefixes_to_remove:
+            if clean_name.lower().startswith(prefix):
+                clean_name = clean_name[len(prefix):]
+                break
+        
+        # Convert value to string and handle objects/arrays
+        if isinstance(field_value, (dict, list)):
+            # For objects/arrays, convert to a simple string representation
+            if isinstance(field_value, list):
+                str_value = ', '.join(str(item) for item in field_value)
+            else:
+                str_value = str(field_value)
+        else:
+            str_value = str(field_value) if field_value is not None else ""
+        
+        # If field already exists, merge intelligently
+        if clean_name in cleaned_fields:
+            existing_value = cleaned_fields[clean_name]
+            # Only merge if both values have content and are different
+            if existing_value and str_value and existing_value != str_value:
+                cleaned_fields[clean_name] = f"{existing_value}; {str_value}"
+            elif not existing_value and str_value:
+                cleaned_fields[clean_name] = str_value
+        else:
+            cleaned_fields[clean_name] = str_value
+    
+    return cleaned_fields
+
+
 def extract_field_from_pdf_files(file_paths):
     """
     Use Claude's native PDF support to extract form data directly from PDF files.
@@ -89,8 +135,11 @@ def extract_field_from_pdf_files(file_paths):
                             - Extract ONLY what you can actually see in the document
                             - DO NOT invent, guess, or hallucinate any data
                             - If a field is empty or not visible, use empty string ""
-                            - Use descriptive field names (e.g., "shipper_name", "consignee_address", "weight", "date")
+                            - Use clean, descriptive field names (e.g., "shipper_name", "consignee_address", "weight", "date")
                             - Look for common shipping document fields: shipper, consignee, notify party, description of goods, weight, dimensions, dates, reference numbers
+                            - ALL field values must be simple strings or numbers - NO nested objects or arrays
+                            - Do NOT prefix field names with file types like "pdf_", "excel_", etc.
+                            - If you find multiple related values, combine them into a single string separated by commas
                             - Return ONLY the JSON object, no additional text
                             """
                         }
@@ -106,6 +155,9 @@ def extract_field_from_pdf_files(file_paths):
         import json
         try:
             parsed_data = json.loads(processed_text)
+            # Clean and merge fields to remove prefixes and handle duplicates
+            if 'extracted_fields' in parsed_data:
+                parsed_data['extracted_fields'] = clean_and_merge_fields(parsed_data['extracted_fields'])
             return {
                 "status": "success",
                 "message": "PDF processed successfully with Claude",
@@ -182,11 +234,14 @@ def extract_field_from_document_with_structured_prompt(document_data):
             }}
         }}
         
-        Instructions:
+        CRITICAL Instructions:
         - Identify the main purpose/type of this data
-        - Extract the most important fields and their common values
-        - If it's tabular data, summarize key patterns or totals
-        - Use descriptive field names based on the column headers
+        - Extract the most important fields and their common values or totals
+        - If it's tabular data, summarize key patterns or aggregate values
+        - Use clean, descriptive field names based on column headers (e.g., "total_amount", "customer_count", "average_price")
+        - ALL field values must be simple strings or numbers - NO nested objects or arrays
+        - Do NOT prefix field names with file types like "excel_", "csv_", etc.
+        - If you find multiple related values, combine them into a single string separated by commas
         - DO NOT invent data - only extract what's clearly present
         - Return ONLY the JSON object, no additional text
         """
@@ -209,6 +264,9 @@ def extract_field_from_document_with_structured_prompt(document_data):
         import json
         try:
             parsed_data = json.loads(processed_text)
+            # Clean and merge fields to remove prefixes and handle duplicates
+            if 'extracted_fields' in parsed_data:
+                parsed_data['extracted_fields'] = clean_and_merge_fields(parsed_data['extracted_fields'])
             return {
                 "status": "success",
                 "message": "CSV/Excel processed successfully with Claude",
@@ -271,25 +329,36 @@ def process_mixed_documents(pdf_files, excel_files):
         excel_document_data = process_documents(excel_files)
         excel_result = extract_field_from_document_with_structured_prompt(excel_document_data)
         
-        # Combine the results
+        # Combine the results intelligently
         combined_fields = {}
         document_types = []
         
         # Add PDF fields
         for pdf_data in pdf_results:
             document_types.append(pdf_data.get('document_type', 'PDF Document'))
-            combined_fields.update(pdf_data.get('extracted_fields', {}))
+            pdf_fields = pdf_data.get('extracted_fields', {})
+            for key, value in pdf_fields.items():
+                combined_fields[key] = value
         
-        # Add Excel fields
+        # Add Excel fields and merge intelligently
         if excel_result.get('structured_data'):
             excel_data = excel_result['structured_data']
             document_types.append(excel_data.get('document_type', 'Excel Document'))
             
-            # Prefix Excel fields to avoid conflicts
             excel_fields = excel_data.get('extracted_fields', {})
             for key, value in excel_fields.items():
-                prefixed_key = f"excel_{key}" if key not in combined_fields else f"excel_{key}"
-                combined_fields[prefixed_key] = value
+                if key in combined_fields:
+                    # Merge if both have content and are different
+                    existing = combined_fields[key]
+                    if existing and value and str(existing) != str(value):
+                        combined_fields[key] = f"{existing}; {value}"
+                    elif not existing and value:
+                        combined_fields[key] = value
+                else:
+                    combined_fields[key] = value
+        
+        # Final cleanup of all combined fields
+        combined_fields = clean_and_merge_fields(combined_fields)
         
         return {
             "status": "success",

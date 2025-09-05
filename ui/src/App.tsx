@@ -74,6 +74,59 @@ function App() {
     }))
   }
 
+  // Utility function to handle object values properly
+  const formatFieldValue = (value: null | undefined): string => {
+    if (value === null || value === undefined) {
+      return ''
+    }
+    
+    if (typeof value === 'string') {
+      return value
+    }
+    
+    if (typeof value === 'object') {
+      // If it's an array, join elements
+      if (Array.isArray(value)) {
+        return value.join(', ')
+      }
+      
+      // If it's an object with properties, format them nicely
+      if (Object.keys(value).length > 0) {
+        return Object.entries(value)
+          .map(([key, val]) => `${key}: ${val}`)
+          .join('; ')
+      }
+      
+      // Empty object
+      return ''
+    }
+    
+    // For numbers, booleans, etc., convert to string
+    return String(value)
+  }
+
+  // Function to render form fields based on the data type
+  const renderFormField = (fieldName: string, fieldValue: null | undefined) => {
+    const formattedValue = formatFieldValue(fieldValue)
+    const currentValue = formData[fieldName] || formattedValue
+    
+    return (
+      <div key={fieldName} className="form-field">
+        <label htmlFor={fieldName} className="form-label">
+          {fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+        </label>
+        <input
+          type="text"
+          id={fieldName}
+          value={currentValue}
+          onChange={(e) => handleFormFieldChange(fieldName, e.target.value)}
+          className="form-input"
+          placeholder={`Enter ${fieldName.replace(/_/g, ' ')}`}
+        />
+      </div>
+    )
+  }
+
   const startOver = () => {
     setResult(null)
     setFiles([])
@@ -180,7 +233,12 @@ function App() {
         setResult(data)
         // Initialize form data with extracted fields if available
         if (data.structured_data?.extracted_fields) {
-          setFormData(data.structured_data.extracted_fields)
+          // Format object values properly when initializing form data
+          const formattedFields: Record<string, string> = {}
+          Object.entries(data.structured_data.extracted_fields).forEach(([key, value]) => {
+            formattedFields[key] = formatFieldValue(value)
+          })
+          setFormData(formattedFields)
         }
       } else {
         setResult({ error: 'Failed to process files' })
@@ -271,21 +329,11 @@ function App() {
                       <h4>📝 Extracted Information</h4>
                       <p>Review and edit the extracted data below:</p>
                       <form className="google-form">
-                        {Object.entries(formData).map(([fieldName, fieldValue]) => (
-                          <div key={fieldName} className="form-field">
-                            <label htmlFor={fieldName} className="form-label">
-                              {fieldName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                            </label>
-                            <input
-                              type="text"
-                              id={fieldName}
-                              value={fieldValue}
-                              onChange={(e) => handleFormFieldChange(fieldName, e.target.value)}
-                              className="form-input"
-                              placeholder={`Enter ${fieldName.replace(/_/g, ' ')}`}
-                            />
-                          </div>
-                        ))}
+                        {result.structured_data?.extracted_fields && 
+                          Object.entries(result.structured_data.extracted_fields).map(([fieldName, fieldValue]) =>
+                            renderFormField(fieldName, fieldValue)
+                          )
+                        }
                         <div className="form-actions">
                           <button 
                             type="button" 
