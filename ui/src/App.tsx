@@ -25,6 +25,7 @@ function App() {
   const [processing, setProcessing] = useState(false)
   const [result, setResult] = useState<Result | null>(null)
   const [formData, setFormData] = useState<Record<string, string>>({})
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved'>('idle')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -81,6 +82,105 @@ function App() {
     setResult(null)
     setFiles([])
     setFormData({})
+  }
+
+  const saveChanges = async () => {
+    if (!result || 'error' in result || !result.structured_data) {
+      alert('No data to save')
+      return
+    }
+
+    setSaveStatus('saving')
+
+    try {
+      // Create save data object
+      const saveData = {
+        document_type: result.structured_data.document_type,
+        extracted_fields: formData,
+        original_fields: result.structured_data.extracted_fields,
+        saved_at: new Date().toISOString(),
+        processing_status: result.status
+      }
+
+      // Save to localStorage
+      const saveKey = `document_${result.structured_data.document_type.replace(/\s+/g, '_').toLowerCase()}_${Date.now()}`
+      localStorage.setItem(saveKey, JSON.stringify(saveData))
+
+      // Also maintain a list of all saved documents
+      const savedDocuments = JSON.parse(localStorage.getItem('saved_documents') || '[]')
+      savedDocuments.unshift({
+        key: saveKey,
+        document_type: result.structured_data.document_type,
+        saved_at: saveData.saved_at,
+        field_count: Object.keys(formData).length
+      })
+      
+      // Keep only the last 10 saved documents
+      if (savedDocuments.length > 10) {
+        const oldKey = savedDocuments[10].key
+        localStorage.removeItem(oldKey)
+        savedDocuments.splice(10)
+      }
+      
+      localStorage.setItem('saved_documents', JSON.stringify(savedDocuments))
+
+      setSaveStatus('saved')
+      
+      // Reset save status after 3 seconds
+      setTimeout(() => {
+        setSaveStatus('idle')
+      }, 3000)
+
+    } catch (error) {
+      console.error('Save failed:', error)
+      alert('Failed to save changes')
+      setSaveStatus('idle')
+    }
+  }
+
+  const exportData = () => {
+    if (!result || 'error' in result || !result.structured_data) {
+      alert('No data to export')
+      return
+    }
+
+    const exportObject = {
+      document_type: result.structured_data.document_type,
+      extracted_fields: formData, // Use current form data (including any edits)
+      exported_at: new Date().toISOString(),
+      processing_status: result.status,
+      processing_message: result.message
+    }
+
+    // Create and download JSON file
+    const jsonBlob = new Blob([JSON.stringify(exportObject, null, 2)], { 
+      type: 'application/json' 
+    })
+    const jsonUrl = URL.createObjectURL(jsonBlob)
+    const jsonLink = document.createElement('a')
+    jsonLink.href = jsonUrl
+    jsonLink.download = `extracted_data_${result.structured_data.document_type.replace(/\s+/g, '_').toLowerCase()}_${new Date().getTime()}.json`
+    jsonLink.click()
+    URL.revokeObjectURL(jsonUrl)
+
+    // Also create CSV file
+    const csvHeaders = ['Field Name', 'Field Value']
+    const csvRows = Object.entries(formData).map(([key, value]) => [
+      key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      `"${value.replace(/"/g, '""')}"`
+    ])
+    const csvContent = [
+      csvHeaders.join(','),
+      ...csvRows.map(row => row.join(','))
+    ].join('\n')
+
+    const csvBlob = new Blob([csvContent], { type: 'text/csv' })
+    const csvUrl = URL.createObjectURL(csvBlob)
+    const csvLink = document.createElement('a')
+    csvLink.href = csvUrl
+    csvLink.download = `extracted_data_${result.structured_data.document_type.replace(/\s+/g, '_').toLowerCase()}_${new Date().getTime()}.csv`
+    csvLink.click()
+    URL.revokeObjectURL(csvUrl)
   }
 
   const processFiles = async () => {
@@ -212,10 +312,17 @@ function App() {
                           </div>
                         ))}
                         <div className="form-actions">
-                          <button type="button" className="save-btn">
-                            💾 Save Changes
+                          <button 
+                            type="button" 
+                            className={`save-btn ${saveStatus === 'saved' ? 'save-btn-saved' : ''}`}
+                            onClick={saveChanges}
+                            disabled={saveStatus === 'saving'}
+                          >
+                            {saveStatus === 'saving' && '⏳ Saving...'}
+                            {saveStatus === 'saved' && '✅ Saved!'}
+                            {saveStatus === 'idle' && '💾 Save Changes'}
                           </button>
-                          <button type="button" className="export-btn">
+                          <button type="button" className="export-btn" onClick={exportData}>
                             📥 Export Data
                           </button>
                         </div>
