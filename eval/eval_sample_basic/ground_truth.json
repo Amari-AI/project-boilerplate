@@ -1,0 +1,11 @@
+{
+  "bill_of_lading_number": "ZMLU34110002",
+  "container_number": "MSCU1234567",
+  "consignee_name": "KABOFER TRADING INC",
+  "consignee_address": "66-89 MAIN ST 8GH 643, FLUSHING, NY, 94089 US",
+  "date": "2019-08-22",
+  "line_items_count": 18,
+  "average_gross_weight": 194.853,
+  "average_price": 0.7678
+}
+

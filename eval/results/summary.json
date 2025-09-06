@@ -1,0 +1,43 @@
+{
+  "summary": {
+    "accuracy": 0.75,
+    "precision": 0.75,
+    "recall": 0.75,
+    "f1": 0.75,
+    "cases": 1
+  },
+  "cases": [
+    {
+      "accuracy": 0.75,
+      "precision": 0.75,
+      "recall": 0.75,
+      "f1": 0.75,
+      "correct": 6,
+      "total": 8,
+      "fp": 2,
+      "fn": 2,
+      "per_field": {
+        "bill_of_lading_number": false,
+        "container_number": true,
+        "consignee_name": true,
+        "consignee_address": false,
+        "date": true,
+        "line_items_count": true,
+        "average_gross_weight": true,
+        "average_price": true
+      },
+      "evaluated_fields": [
+        "bill_of_lading_number",
+        "container_number",
+        "consignee_name",
+        "consignee_address",
+        "date",
+        "line_items_count",
+        "average_gross_weight",
+        "average_price"
+      ],
+      "case": "eval_sample_basic",
+      "source": "api:http://0.0.0.0:8000"
+    }
+  ]
+}

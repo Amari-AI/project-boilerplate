@@ -86,7 +86,7 @@ Script entrypoint:
 - Preferred: `python eval/evaluation.py`
 - Back-compat shim: `python evaluation.py` (redirects to the above)
 
-Run all evals (auto-discovers `eval_*` folders):
+Run all evals (auto-discovers `eval_*` folders) and write results into `eval/`:
 
 ```bash
 python eval/evaluation.py run-all --api http://localhost:8000 --out results/summary.json
@@ -98,7 +98,7 @@ Run a single eval case (by suffix or full folder name):
 python eval/evaluation.py run sample_basic --api http://localhost:8000
 ```
 
-Without an API (uses predictions.json fallback if present):
+Without an API (uses predictions.json fallback if present) and write results into `eval/`:
 
 ```bash
 python eval/evaluation.py run-all --out results/summary.json
