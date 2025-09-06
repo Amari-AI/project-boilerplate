@@ -76,8 +76,47 @@ Run tests:
 
 ## Evaluation
 
-Run the evaluation script:
+The evaluation suite lives under `eval/`. Each evaluation case is a folder named `eval_{name}` containing:
+
+- `files/`: the shipment documents to upload to the API (PDFs/XLSX)
+- `ground_truth.json`: labeled expected values for the canonical fields
+- `predictions.json` (optional): cached API output; used as a fallback when not calling the API
+
+Script entrypoint:
+- Preferred: `python eval/evaluation.py`
+- Back-compat shim: `python evaluation.py` (redirects to the above)
+
+Run all evals (auto-discovers `eval_*` folders):
 
 ```bash
-    python evaluation.py
+python eval/evaluation.py run-all --api http://localhost:8000 --out results/summary.json
 ```
+
+Run a single eval case (by suffix or full folder name):
+
+```bash
+python eval/evaluation.py run sample_basic --api http://localhost:8000
+```
+
+Without an API (uses predictions.json fallback if present):
+
+```bash
+python eval/evaluation.py run-all --out results/summary.json
+```
+
+Evaluated fields:
+- bill_of_lading_number
+- container_number
+- consignee_name
+- consignee_address
+- date
+- line_items_count
+- average_gross_weight
+- average_price
+
+Normalization & matching:
+- Flexible key aliases normalized (e.g., "BOL Number" → `bill_of_lading_number`).
+- Numbers compared with tolerance (`--rel-tol`, `--abs-tol`); dates normalized to `YYYY-MM-DD`.
+
+Sample case included:
+- `eval/eval_sample_basic/` contains a `ground_truth.json`, placeholder `files/`, and a `predictions.json` so you can run the eval without the API.

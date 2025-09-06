@@ -1,21 +1,11 @@
-import json
-import requests
-from pathlib import Path
-def evaluate_results(expected_data, actual_data):
-    """
-    Calculate accuracy metrics.
-    Args:
-    expected_data: Dictionary with expected values
-    actual_data: Dictionary with actual values
-    Returns:
-    dict: Metrics
-    """
-    return {}
+"""
+This entrypoint is kept for backward compatibility.
+Preferred usage: `python eval/evaluation.py run-all --api http://localhost:8000`
+or run a single case with `python eval/evaluation.py run sample_basic`.
+"""
 
-def main():
-    # TODO: Implement main evaluation logic
-    pass
-
+from eval.evaluation import main  # type: ignore
 
 if __name__ == "__main__":
+    print("Note: evaluation has moved to eval/evaluation.py. Redirecting...", file=sys.stderr)
     main()
