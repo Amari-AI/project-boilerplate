@@ -1,5 +1,5 @@
-from pydantic import BaseModel
-from typing import Optional
+from pydantic import BaseModel, field_validator
+from typing import Optional, Union
 from datetime import date
 
 class ShipmentData(BaseModel):
@@ -12,6 +12,14 @@ class ShipmentData(BaseModel):
     line_items_count: Optional[str] = None
     average_gross_weight: Optional[str] = None
     average_price: Optional[str] = None
+
+    @field_validator('line_items_count', 'average_gross_weight', 'average_price', mode='before')
+    @classmethod
+    def convert_to_string(cls, v) -> Optional[str]:
+        """Convert numeric values to strings"""
+        if v is None:
+            return None
+        return str(v)
 
 class ProcessDocumentsResponse(BaseModel):
     """Response model for document processing"""
