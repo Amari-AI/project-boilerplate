@@ -14,9 +14,12 @@ interface ShipmentData {
 interface ExtractedDataFormProps {
   data: ShipmentData;
   onUpdateField: (field: keyof ShipmentData, value: string) => void;
+  onSave: () => void;
+  onReset?: () => void;
+  saving?: boolean;
 }
 
-const ExtractedDataForm: React.FC<ExtractedDataFormProps> = ({ data, onUpdateField }) => {
+const ExtractedDataForm: React.FC<ExtractedDataFormProps> = ({ data, onUpdateField, onSave, onReset, saving }) => {
   const handleChange = (field: keyof ShipmentData) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     onUpdateField(field, e.target.value);
   };
@@ -172,17 +175,28 @@ const ExtractedDataForm: React.FC<ExtractedDataFormProps> = ({ data, onUpdateFie
 
         {/* Action Buttons */}
         <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+          {onReset && (
+            <button
+              type="button"
+              onClick={onReset}
+              className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            >
+              Reset
+            </button>
+          )}
           <button
             type="button"
-            className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+            onClick={onSave}
+            disabled={saving}
+            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
           >
-            Reset
-          </button>
-          <button
-            type="button"
-            className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-          >
-            Save Data
+            {saving && (
+              <svg className="animate-spin -ml-1 mr-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            )}
+            {saving ? 'Saving...' : 'Save Data'}
           </button>
         </div>
       </form>

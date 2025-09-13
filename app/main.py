@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from app.api.routes import router
+from app.api.accuracy_routes import router as accuracy_router
 import uvicorn
 import os
 
@@ -19,6 +20,7 @@ app.add_middleware(
 
 # Include API routes
 app.include_router(router)
+app.include_router(accuracy_router)
 
 @app.get("/")
 async def root():

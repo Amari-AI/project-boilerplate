@@ -1,10 +1,12 @@
 # Shipment Document Processor Makefile
 
-.PHONY: help install dev dev-backend dev-frontend down build test clean
+.PHONY: help install dev dev-backend dev-frontend down build test clean docker-build docker-up docker-down docker-logs docker-clean docker-restart docker-ps
 
 # Default target
 help:
 	@echo "Available targets:"
+	@echo ""
+	@echo "Local Development:"
 	@echo "  install        - Install all dependencies (Python and Node.js)"
 	@echo "  dev            - Run both backend and frontend in development mode"
 	@echo "  dev-backend    - Run only the FastAPI backend server"
@@ -12,7 +14,17 @@ help:
 	@echo "  down           - Stop all running development servers"
 	@echo "  build          - Build the React frontend for production"
 	@echo "  test           - Run Python tests"
+	@echo "  test-coverage  - Run tests with coverage report"
+	@echo "  test-file      - Run specific test file (use FILE=filename)"
+	@echo "  test-marker    - Run tests with specific marker (use MARKER=name)"
 	@echo "  clean          - Clean build artifacts and temporary files"
+	@echo ""
+	@echo "Docker Commands:"
+	@echo "  docker-build   - Build Docker images"
+	@echo "  docker-up      - Start application using Docker Compose"
+	@echo "  docker-down    - Stop and remove Docker containers"
+	@echo "  docker-logs    - View Docker container logs"
+	@echo "  docker-clean   - Clean up Docker images and containers"
 
 # Install all dependencies
 install:
@@ -67,6 +79,29 @@ test:
 	./venv/bin/python -m pytest tests/ -v
 	@echo "Tests completed!"
 
+# Run tests with coverage
+test-coverage:
+	@echo "Running tests with coverage..."
+	./venv/bin/python -m pytest tests/ -v --cov=app --cov-report=html --cov-report=term
+	@echo "Coverage report generated in htmlcov/"
+
+# Run specific test file
+test-file:
+	@echo "Usage: make test-file FILE=test_api_routes.py"
+	@if [ -z "$(FILE)" ]; then echo "Please specify FILE=<test_file>"; exit 1; fi
+	./venv/bin/python -m pytest tests/$(FILE) -v
+
+# Run tests with specific marker
+test-marker:
+	@echo "Usage: make test-marker MARKER=api"
+	@if [ -z "$(MARKER)" ]; then echo "Please specify MARKER=<marker_name>"; exit 1; fi
+	./venv/bin/python -m pytest tests/ -m $(MARKER) -v
+
+# Run tests in parallel
+test-parallel:
+	@echo "Running tests in parallel..."
+	./venv/bin/python -m pytest tests/ -v -n auto
+
 # Clean build artifacts
 clean:
 	@echo "Cleaning build artifacts..."
@@ -91,3 +126,48 @@ install-python:
 install-frontend:
 	@echo "Installing Node.js dependencies..."
 	cd app/frontend && npm install
+
+# ===== DOCKER COMMANDS =====
+
+# Build Docker images
+docker-build:
+	@echo "Building Docker images..."
+	docker-compose build --no-cache
+	@echo "Docker images built successfully!"
+
+# Start application with Docker
+docker-up:
+	@echo "Starting application with Docker Compose..."
+	@echo "Backend will be available at http://localhost:8000"
+	@echo "Frontend will be available at http://localhost:3000"
+	docker-compose up -d
+	@echo "Application started! Use 'make docker-logs' to view logs."
+
+# Stop Docker containers
+docker-down:
+	@echo "Stopping Docker containers..."
+	docker-compose down
+	@echo "Docker containers stopped!"
+
+# View Docker logs
+docker-logs:
+	@echo "Viewing Docker container logs (Ctrl+C to exit)..."
+	docker-compose logs -f
+
+# Clean up Docker resources
+docker-clean:
+	@echo "Cleaning up Docker resources..."
+	docker-compose down -v --rmi all --remove-orphans
+	docker system prune -f
+	@echo "Docker cleanup completed!"
+
+# Restart Docker services
+docker-restart:
+	@echo "Restarting Docker services..."
+	docker-compose restart
+	@echo "Docker services restarted!"
+
+# View running Docker containers
+docker-ps:
+	@echo "Running Docker containers:"
+	docker-compose ps
